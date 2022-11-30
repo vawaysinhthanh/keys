@@ -1,6 +1,21 @@
+import os
+import sys
+import time
 import base64
 import requests
+import datetime
 
+
+def get_machine_address():
+    os_type = sys.platform.lower()
+    if "darwin" in os_type:
+        command = """
+            ioreg -ad2 -c IOPlatformExpertDevice | 
+            xmllint --xpath '//key[.="IOPlatformUUID"]/following-sibling::*[1]/text()' -
+        """
+    elif "win" in os_type:
+        command = "wmic csproduct get UUID"
+    return "".join(os.popen(command).read().replace('"', "").split())
 
 def get_keys():
 	user = "mrshaw01"
@@ -13,12 +28,17 @@ def get_keys():
 	for key in keys.split("\n"):
 		key = key.strip().split()
 		try:
-			dict_keys[key[0]] = {}
-			dict_keys[key[0]]['tool'] = key[1]
-			dict_keys[key[0]]['date'] = key[2]
+			dict_keys[f"{key[0]} {key[1]}"] = time.mktime(datetime.datetime.strptime(key[2], "%d/%m/%Y").timetuple())
 		except:
 			pass
 	return dict_keys
 
-dict_keys = get_keys()
-print(dict_keys)
+def check_authorization(tool):
+	dict_keys = get_keys()
+	user = f"{get_machine_address()} {tool}"
+	if user in dict_keys and time.time() < dict_keys[user]:
+		return True
+	else:
+		return False
+
+print(check_authorization("tiki-balances"))
