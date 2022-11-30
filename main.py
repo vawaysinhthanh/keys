@@ -18,28 +18,31 @@ def get_machine_address():
     return "".join(os.popen(command).read().replace('"', "").split())
 
 def get_keys():
-	user = "mrshaw01"
-	repo_name = "keys"
-	path_to_file = "keys.txt"
-	url = f'https://api.github.com/repos/{user}/{repo_name}/contents/{path_to_file}'
-	res = requests.get(url)
-	keys = base64.b64decode(res.json()["content"]).decode("utf-8")
-	dict_keys = {}
-	for key in keys.split("\n"):
-		key = key.strip().split()
-		try:
-			dict_keys[f"{key[0]} {key[1]}"] = time.mktime(datetime.datetime.strptime(key[2], "%d/%m/%Y").timetuple())
-		except:
-			pass
-	return dict_keys
+    user = "mrshaw01"
+    repo_name = "keys"
+    path_to_file = "keys.txt"
+    url = f'https://api.github.com/repos/{user}/{repo_name}/contents/{path_to_file}'
+    res = requests.get(url)
+    keys = base64.b64decode(res.json()["content"]).decode("utf-8")
+    dict_keys = {}
+    for key in keys.split("\n"):
+        key = key.strip().split()
+        try:
+            dict_keys[f"{key[0]} {key[1]}"] = time.mktime(datetime.datetime.strptime(key[2], "%d/%m/%Y").timetuple())
+        except:
+            pass
+    return dict_keys
 
 def check_authorization(tool):
-	dict_keys = get_keys()
-	user = f"{get_machine_address()} {tool}"
+    dict_keys = get_keys()
+    user = f"{get_machine_address()} {tool}"
     print(user)
-	if user in dict_keys and time.time() < dict_keys[user]:
-		return True
-	else:
-		return False
+    if user in dict_keys and time.time() < dict_keys[user]:
+        return True
+    else:
+        return False
 
-print(check_authorization("tiki-balances"))
+k = get_keys()
+for x in k:
+	print(x, k[x])
+print(len(k.keys()))
