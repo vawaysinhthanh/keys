@@ -35,8 +35,8 @@ def get_keys():
 
 def check_authorization(tool):
 	dict_keys = get_keys()
-	print(dict_keys)
 	user = f"{get_machine_address()} {tool}"
+    print(user)
 	if user in dict_keys and time.time() < dict_keys[user]:
 		return True
 	else:
